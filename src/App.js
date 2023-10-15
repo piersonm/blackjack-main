@@ -9,10 +9,6 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    // this.playerHand = [];
-    // this.playerHandTotal = 0;
-    // this.dealerHand = [];
-    // this.dealerHandTotal = 0;
     this.playerHand = {
       name: "player",
       value: 0,
@@ -30,11 +26,14 @@ class App extends Component {
     this.playerWon = false;
     this.dealerWon = false;
     this.blackjack = false;
+    this.pushResult = false;
 
     this.state = {
       showButtons: false,
-      showStartButton: true
+      showStartButton: true,
+      result: false
     }
+    this.resultText = String;
   }
 
   //Button functionality
@@ -49,23 +48,34 @@ class App extends Component {
 
   endGame = () => {
     if (this.playerBust === true) {
+      this.resultText = "YOU BUST";
       console.log("YOU BUST");
     }
     else if (this.playerWon === true) {
       if(this.blackjack === true){
+        this.resultText = "BLACKJACK";
         console.log("BLACKJACK")
       }
+      this.resultText = "YOU WON";
       console.log("YOU WON");
     }
     else if (this.dealerBust === true) {
+      this.resultText = "DEALER BUST";
       console.log("DEALER BUST");
+    }
+    else if (this.pushResult === true) {
+      this.resultText = "PUSH";
+      console.log("PUSH");
     }
     else if (this.dealerWon === true) {
       if(this.blackjack === true){
+        this.resultText = "DEALER HAS BLACKJACK";
         console.log("DEALER HAS BLACKJACK")
       }
+      this.resultText = "DEALER WON";
       console.log("DEALER WON");
     }
+    this.setState({result: true})
     this.setState({showButtons: false})
     this.setState({showStartButton: true})
 
@@ -95,6 +105,8 @@ class App extends Component {
 
     if(this.playerHand.value > 21) {
       this.playerBust = true;
+      let flipCard = document.getElementById("dealerSecondCard");
+      flipCard.src = `card-Images/${this.dealerHand.cards[1].src}`;
       this.endGame();
     }
     if(this.playerHand.value === 21) {
@@ -106,6 +118,8 @@ class App extends Component {
   //Stand button functionality
   stand = () => {
     while(this.dealerHand.value < 17) {
+      let flipCard = document.getElementById("dealerSecondCard");
+      flipCard.src = `card-Images/${this.dealerHand.cards[1].src}`;
       this.dealCard(this.dealerHand);
       this.dealerHand.value = this.getCardPointsTotal(this.dealerHand)
     }
@@ -120,6 +134,9 @@ class App extends Component {
     else if(this.playerHand.value < this.dealerHand.value) {
       this.dealerWon = true;
     }
+    else if (this.playerHand.value === this.dealerHand.value) {
+      this.pushResult = true;
+    }
     console.log(this.dealerHand);
     this.endGame();
   }
@@ -133,13 +150,24 @@ class App extends Component {
   dealCard = hand => {
     
     let drawnCard = this.deck.pop();
-    this.checkForAce(drawnCard, hand);
     hand.cards.push(drawnCard);
+    this.checkForBlackJack(drawnCard, hand);
 
     var cardImage = document.createElement("img");
-    cardImage.src = `card-Images/${drawnCard.src}`;
-    cardImage.className += `deal-${hand.name}`;
-    document.getElementById("playerHand").appendChild(cardImage);
+    if (hand.name === "dealer" && hand.cards.length === 2) {
+
+      cardImage.id = `dealerSecondCard`;
+      cardImage.src = `card-Images/BACK.png`;
+      cardImage.className += `deal-${hand.name}`;
+      document.getElementById(`${hand.name}Hand`).appendChild(cardImage);
+    }
+
+    else { 
+      cardImage = document.createElement("img");
+      cardImage.src = `card-Images/${drawnCard.src}`;
+      cardImage.className += `deal-${hand.name}`;
+      document.getElementById(`${hand.name}Hand`).appendChild(cardImage);
+    }
     
   }
 
@@ -206,6 +234,19 @@ class App extends Component {
     }
   }
 
+  checkForBlackJack = (card, hand) => {
+    if (card.name === "ace" && hand.cards[0].value === 10) {
+      this.blackjack = true;
+      this.endGame();
+    }
+    else if (card.value === 10 && hand.cards[0].name === "ace") {
+      this.blackjack = true;
+      this.dealerWon = true;
+      this.endGame();
+    }
+
+  }
+
   getCardPointsTotal = hand => {
     
     this.sum = 0;
@@ -216,6 +257,11 @@ class App extends Component {
   }
 
   reset = () => {
+
+    document.querySelectorAll("#dealerHand img")
+      .forEach(img => img.remove());
+    document.querySelectorAll("#playerHand img")
+      .forEach(img => img.remove());
     this.playerHand = {
       name: "player",
       value: 0,
@@ -226,11 +272,16 @@ class App extends Component {
       value: 0,
       cards: []
     }
+
     this.playerBust = false;
     this.dealerBust = false;
     this.playerWon = false;
     this.dealerWon = false;
     this.blackjack = false;
+    this.pushResult = false;
+    this.setState({result: false});
+
+    
   }
 ;
   render() {
@@ -238,29 +289,30 @@ class App extends Component {
     return (
       
       <div className="App">
-        <div>
-            <h5>BLACKJACK</h5>
-            {this.state.showStartButton && (<Button id="startButton" onClick={this.startGame} variant="contained">Start Game</Button>)}
-            <div id="deck">
-              <img src="card-Images/BACK.png" alt='deck' id="deck-pile" ></img>
-            </div>
+        <div className="header-container">
+          <h5>BLACKJACK</h5>
+          {this.state.showStartButton && (<Button id="startButton" onClick={this.startGame} variant="contained">Start Game</Button>)}
+          </div>
+        <div id="deck">
+          <img src="card-Images/BACK.png" alt='deck' id="deck-pile" ></img>
         </div>
         <div>
-            <div id="dealerHand">
+          {this.state.result && (<div className="result-container">{this.resultText}</div>)}
+          <div id="hands" className="hands-container">
+            <div id="dealerHand" className="row">
 
             </div>
-            <div/>
-            <div id="playerHand">
+            <div id="playerHand" className="row">
 
             </div>
-        
+          </div>
         </div>
         {this.state.showButtons && (<div className='buttonPosition'><Stack direction="row" spacing={2}>
         <Button id="doubleButton" onClick={this.double} variant="contained">DOUBLE</Button>
         <Button id="hitButton" onClick={this.hit} variant="contained"> HIT</Button>
         <Button id="standButton" onClick={this.stand} variant="contained">STAND</Button>
-      </Stack></div>
-      )}
+        </Stack></div>
+        )}
         
       </div>
     );
