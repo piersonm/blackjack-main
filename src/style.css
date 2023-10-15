@@ -1,3 +1,4 @@
+/* Broad site-wide styles */
 body {
 	background: #1f513b;
 	background: linear-gradient(to top right, #1f513b, #0F2725) fixed;
@@ -31,7 +32,7 @@ strong {
 }
 
 
-/* button, button:focus {
+button, button:focus {
 	margin: 5px;
 	padding: 10px 20px;
 	background: #d60438;
@@ -40,9 +41,9 @@ strong {
 	font-weight: 400;
 	letter-spacing: 1px;
 	border: 0;
-} */
+}
 
-/* button.secondary {
+button.secondary {
 	background: #1E6692;
 }
 
@@ -52,56 +53,6 @@ button:active {
 
 button.disabled-button, button.secondary.disabled-button {
 	background: #0F2725;
-} */
-
-.buttonPosition {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-height: 0vh;
-}
-.hideButton {
-  display: none;
-}
-
-#deck {
-  display: flex;
-  margin-top: 30vh;
-  margin-bottom: 30vw;
-  margin-left: 5%;
-}
-
-@keyframes deal-player {
-	0% {
-		transform: translate(-90px, -150px);
-	}
-	50% {
-		transform: translate(-50px, -50px);
-	}
-	100% {
-		transform: translate(0, 0);
-  	}
-}
-
-.deal-player {
-  width: 150px;
-  height: 200px;
-  display: flex;
-  margin-top: 30vh;
-  margin-bottom: 30vw;
-  margin-left: 5%;
-}
-.deal-player.animate {
-  -webkit-transition: 3s;
-  -moz-transition: 3s;
-  -ms-transition: 3s;
-  -o-transition: 3s;
-  transition: 3s;
-  margin-left: 30% !important;
-  margin-top: 10vh;
-  margin-bottom: 17vh;
-
 }
 
 /* Welcome screen */
@@ -139,8 +90,6 @@ button.disabled-button, button.secondary.disabled-button {
 #deck-pile, #dealer, #user-hand, #user-split-hand {
 	display: inline-block;
 	position: relative;
-  width: 150px;
-  height: 200px;
 }
 
 .card {
@@ -264,7 +213,7 @@ table {
 	margin-right: -30px;
 }
 
-Game button action items are styled bigger than the other buttons
+/* Game button action items are styled bigger than the other buttons */
 #sidebar button {
 	width: 100%;
 	height: 70px;
