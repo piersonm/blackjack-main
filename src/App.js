@@ -56,8 +56,10 @@ class App extends Component {
         this.resultText = "BLACKJACK";
         console.log("BLACKJACK")
       }
-      this.resultText = "YOU WON";
-      console.log("YOU WON");
+      else {
+        this.resultText = "YOU WON";
+        console.log("YOU WON");
+      }
     }
     else if (this.dealerBust === true) {
       this.resultText = "DEALER BUST";
@@ -69,11 +71,15 @@ class App extends Component {
     }
     else if (this.dealerWon === true) {
       if(this.blackjack === true){
+        let flipCard = document.getElementById("dealerSecondCard");
+        flipCard.src = `card-Images/${this.dealerHand.cards[1].src}`;
         this.resultText = "DEALER HAS BLACKJACK";
         console.log("DEALER HAS BLACKJACK")
       }
-      this.resultText = "DEALER WON";
-      console.log("DEALER WON");
+      else {
+        this.resultText = "DEALER WON";
+        console.log("DEALER WON")
+      }
     }
     this.setState({result: true})
     this.setState({showButtons: false})
@@ -117,9 +123,10 @@ class App extends Component {
 
   //Stand button functionality
   stand = () => {
+    let flipCard = document.getElementById("dealerSecondCard");
+    flipCard.src = `card-Images/${this.dealerHand.cards[1].src}`;
+
     while(this.dealerHand.value < 17) {
-      let flipCard = document.getElementById("dealerSecondCard");
-      flipCard.src = `card-Images/${this.dealerHand.cards[1].src}`;
       this.dealCard(this.dealerHand);
       this.dealerHand.value = this.getCardPointsTotal(this.dealerHand)
     }
@@ -151,7 +158,13 @@ class App extends Component {
     
     let drawnCard = this.deck.pop();
     hand.cards.push(drawnCard);
-    this.checkForBlackJack(drawnCard, hand);
+    if(hand.cards[0].value === 10) {
+      this.checkForBlackJack(drawnCard, hand);
+    }
+    if (drawnCard.name === "ace") {
+      this.aceValue(drawnCard, hand);
+    }
+    
 
     var cardImage = document.createElement("img");
     if (hand.name === "dealer" && hand.cards.length === 2) {
@@ -202,46 +215,30 @@ class App extends Component {
   }
 
   //Check if dealt card is an ace and evaluate it's point value
-  checkForAce = (card, hand) => {
-    if(card.name === "ace") {
-      if(this.getCardPointsTotal(hand) === 10){
-        //BlackJack
-        if(hand.cards.length === 1) {
-          this.blackjack = true;
-          if(hand.name === "player"){
-            this.playerWon = true;
-          }
-          if(hand.name === "dealer"){
-            this.dealerWon = true;
-          }
-          this.endGame();
-        }
-        else {
-
-          if(hand.name === "player"){
-            this.playerWon = true;
-          }
-          if(hand.name === "dealer"){
-            this.dealerWon = true;
-          }
-          this.endGame();
-        }
-      }
-
-      if(this.getCardPointsTotal(hand) >= 11){
-        card.value = 1;
-      }
+  aceValue = (card, hand) => {
+    if (hand.value > 10) {
+      card.value = 1;
     }
+    else if (hand.value <=10) {
+      card.value = 11;
+    }
+
+    return card.value;
   }
 
   checkForBlackJack = (card, hand) => {
     if (card.name === "ace" && hand.cards[0].value === 10) {
+      if (hand.name === "player") {
+        this.playerWon = true;
+      }
+      else if (hand.name === "dealer") {
+        this.dealerWon = true;
+      }
       this.blackjack = true;
       this.endGame();
     }
     else if (card.value === 10 && hand.cards[0].name === "ace") {
       this.blackjack = true;
-      this.dealerWon = true;
       this.endGame();
     }
 
@@ -292,21 +289,19 @@ class App extends Component {
         <div className="header-container">
           <h5>BLACKJACK</h5>
           {this.state.showStartButton && (<Button id="startButton" onClick={this.startGame} variant="contained">Start Game</Button>)}
-          </div>
-        <div id="deck">
+        </div>
+        <div id="deck" className="deck-container">
           <img src="card-Images/BACK.png" alt='deck' id="deck-pile" ></img>
         </div>
-        <div>
-          {this.state.result && (<div className="result-container">{this.resultText}</div>)}
-          <div id="hands" className="hands-container">
-            <div id="dealerHand" className="row">
+        <div id="hands" className="hands-container">
+          <div id="dealerHand" className="row">
 
-            </div>
-            <div id="playerHand" className="row">
+          </div>
+          <div id="playerHand" className="row">
 
-            </div>
           </div>
         </div>
+        {this.state.result && (<div className="result-container">{this.resultText}</div>)}
         {this.state.showButtons && (<div className='buttonPosition'><Stack direction="row" spacing={2}>
         <Button id="doubleButton" onClick={this.double} variant="contained">DOUBLE</Button>
         <Button id="hitButton" onClick={this.hit} variant="contained"> HIT</Button>
