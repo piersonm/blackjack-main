@@ -77,10 +77,10 @@ strong {
 	margin-top: 20vh;
 }
 .deal-player {
-  width: 150px;
-  height: 200px;
-  display: flex;
-  margin-left: 2%;
+	width: 120px;
+	height: 150px;
+	display: flex;
+	margin-left: 2%;
 }
 .deal-player.animate {
   -webkit-transition: 3s;
@@ -98,12 +98,12 @@ strong {
 	height: 47%;
 	justify-content: center;
 	align-items: center;
-	margin-top: -40vh;
+	margin-top: -35vh;
 }
 
 .deal-dealer {
-	width: 150px;
-	height: 200px;
+	width: 120px;
+	height: 150px;
 	display: flex;
 	margin-left: 2%;
 }
@@ -166,8 +166,8 @@ strong {
 #deck-pile, #dealer, #user-hand, #user-split-hand {
 	display: inline-block;
 	position: relative;
-  width: 150px;
-  height: 200px;
+	width: 120px;
+	height: 150px;
 }
 
 .card {

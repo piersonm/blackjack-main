@@ -25,7 +25,8 @@ class App extends Component {
     this.dealerBust = false;
     this.playerWon = false;
     this.dealerWon = false;
-    this.blackjack = false;
+    this.playerBlackjack = false;
+    this.dealerBlackjack = false;
     this.pushResult = false;
 
     this.state = {
@@ -43,6 +44,16 @@ class App extends Component {
     this.reset();
     this.shuffleDeck();
     this.dealCards();
+    if(this.playerHand.value === 21) {
+      this.playerBlackjack = true;
+      this.playerWon = true;
+      this.endGame();
+    }
+    else if (this.dealerHand.value === 21) {
+      this.dealerBlackjack = true;
+      this.dealerWon = true;
+      this.endGame();
+    }
     
   }
 
@@ -52,7 +63,7 @@ class App extends Component {
       console.log("YOU BUST");
     }
     else if (this.playerWon === true) {
-      if(this.blackjack === true){
+      if(this.playerBlackjack === true){
         this.resultText = "BLACKJACK";
         console.log("BLACKJACK")
       }
@@ -70,7 +81,7 @@ class App extends Component {
       console.log("PUSH");
     }
     else if (this.dealerWon === true) {
-      if(this.blackjack === true){
+      if(this.dealerBlackjack === true){
         let flipCard = document.getElementById("dealerSecondCard");
         flipCard.src = `card-Images/${this.dealerHand.cards[1].src}`;
         this.resultText = "DEALER HAS BLACKJACK";
@@ -158,13 +169,6 @@ class App extends Component {
     
     let drawnCard = this.deck.pop();
     hand.cards.push(drawnCard);
-    if(hand.cards[0].value === 10) {
-      this.checkForBlackJack(drawnCard, hand);
-    }
-    if (drawnCard.name === "ace") {
-      this.aceValue(drawnCard, hand);
-    }
-    
 
     var cardImage = document.createElement("img");
     if (hand.name === "dealer" && hand.cards.length === 2) {
@@ -208,10 +212,6 @@ class App extends Component {
     console.log(this.dealerHand);
     }, 3000);
 
-    if(this.dealerHand.value || this.playerHand.value === 21) {
-      this.blackjack = true;
-      this.endGame();
-    }
   }
 
   //Check if dealt card is an ace and evaluate it's point value
@@ -222,12 +222,12 @@ class App extends Component {
     else if (hand.value <=10) {
       card.value = 11;
     }
-
     return card.value;
   }
 
+  //Check for blackjack
   checkForBlackJack = (card, hand) => {
-    if (card.name === "ace" && hand.cards[0].value === 10) {
+    if (card.name === "ace" && hand.cards[1].value === 10) {
       if (hand.name === "player") {
         this.playerWon = true;
       }
@@ -237,7 +237,13 @@ class App extends Component {
       this.blackjack = true;
       this.endGame();
     }
-    else if (card.value === 10 && hand.cards[0].name === "ace") {
+    else if (card.value === 10 && hand.cards[1].name === "ace") {
+      if (hand.name === "player") {
+        this.playerWon = true;
+      }
+      else if (hand.name === "dealer") {
+        this.dealerWon = true;
+      }
       this.blackjack = true;
       this.endGame();
     }
